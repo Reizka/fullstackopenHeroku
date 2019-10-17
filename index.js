@@ -3,59 +3,110 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
-let notes = [
+
+let persons = [
   {
-    id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true
+    name: "Mister Lacelove",
+    number: "39-44-5323523",
+    id: 1
   },
   {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false
+    name: "Ada Lovelace",
+    number: "39-44-5323523",
+    id: 2
   },
   {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true
+    name: "Dan Abramov",
+    number: "12-43-234345",
+    id: 3
+  },
+  {
+    name: "Mary Poppendieck",
+    number: "39-23-6423122",
+    id: 4
   }
 ];
 
 const generateId = function() {
-  const maxId = notes.length > 0 ? Math.max(...notes.map(n => n.id)) : 0;
-  return maxId + 1;
+  console.log("started");
+  let no = Math.floor(Math.random() * (1000000 + persons.length));
+  return no;
 };
 
-app.post("/notes", (request, response) => {
+app.post("/persons", (request, response) => {
   const body = request.body;
 
-  if (!body.content) {
+  if (!body || !body.name || !body.number) {
     return response.status(400).json({
       error: "content missing"
     });
   }
 
-  const note = {
-    content: body.content,
-    important: body.important || false,
-    date: new Date(),
+  if (
+    persons.find(function(person) {
+      return person.name === body.name;
+    })
+  ) {
+    return response.status(400).json({
+      error: "name must be unique"
+    });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
     id: generateId()
   };
+  console.log("person", person);
+  persons = persons.concat(person);
 
-  notes = notes.concat(note);
-
-  response.json(note);
+  response.json(person);
 });
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World!</h1>");
+app.delete("/persons/:id", (request, response) => {
+  const id = Number(request.params.id);
+
+  persons = persons.filter(function(person) {
+    return person.id !== id;
+  });
+
+  response.status(204).end();
 });
 
-app.get("/notes", (req, res) => {
-  res.json(notes);
+app.get("/persons/:id", (req, res) => {
+  const id = Number(req.params.id);
+  person = persons.find(function(person) {
+    //console.log(person.id, typeof person.id, id, typeof id, person.id === id);
+    if (person.id === id) {
+      return person;
+    }
+  });
+
+  if (person) {
+    res.json(person);
+  } else {
+    res.status(404).end();
+  }
+});
+
+app.get("/persons", (req, res) => {
+  res.json(persons);
+});
+
+//https://stackoverflow.com/questions/10645994/how-to-format-a-utc-date-as-a-yyyy-mm-dd-hhmmss-string-using-nodejs
+app.get("/info", (req, res) => {
+  res.send(
+    `<div>
+      <h1>Phonebook Info</h1>
+      <p> Currently the phonebook db has stored info of ${
+        persons.length
+      } persons</p>
+      <p>${new Date()
+        .toISOString()
+        .replace(/T/, " ")
+        .replace(/\..+/, "")}
+    </div>`
+  );
 });
 
 app.get("/notes/:id", (request, response) => {
