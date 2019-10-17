@@ -1,44 +1,47 @@
-const http = require("http");
-const express = require("express");
+const http = require('http');
+const express = require('express');
 const app = express();
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
 app.use(bodyParser.json());
+
+app.use(morgan('tiny'));
 
 let persons = [
   {
-    name: "Mister Lacelove",
-    number: "39-44-5323523",
+    name: 'Mister Lacelove',
+    number: '39-44-5323523',
     id: 1
   },
   {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
+    name: 'Ada Lovelace',
+    number: '39-44-5323523',
     id: 2
   },
   {
-    name: "Dan Abramov",
-    number: "12-43-234345",
+    name: 'Dan Abramov',
+    number: '12-43-234345',
     id: 3
   },
   {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
+    name: 'Mary Poppendieck',
+    number: '39-23-6423122',
     id: 4
   }
 ];
 
 const generateId = function() {
-  console.log("started");
+  console.log('started');
   let no = Math.floor(Math.random() * (1000000 + persons.length));
   return no;
 };
 
-app.post("/persons", (request, response) => {
+app.post('/persons', (request, response) => {
   const body = request.body;
 
   if (!body || !body.name || !body.number) {
     return response.status(400).json({
-      error: "content missing"
+      error: 'content missing'
     });
   }
 
@@ -48,7 +51,7 @@ app.post("/persons", (request, response) => {
     })
   ) {
     return response.status(400).json({
-      error: "name must be unique"
+      error: 'name must be unique'
     });
   }
 
@@ -57,13 +60,13 @@ app.post("/persons", (request, response) => {
     number: body.number,
     id: generateId()
   };
-  console.log("person", person);
+  console.log('person', person);
   persons = persons.concat(person);
 
   response.json(person);
 });
 
-app.delete("/persons/:id", (request, response) => {
+app.delete('/persons/:id', (request, response) => {
   const id = Number(request.params.id);
 
   persons = persons.filter(function(person) {
@@ -73,7 +76,7 @@ app.delete("/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
-app.get("/persons/:id", (req, res) => {
+app.get('/persons/:id', (req, res) => {
   const id = Number(req.params.id);
   person = persons.find(function(person) {
     //console.log(person.id, typeof person.id, id, typeof id, person.id === id);
@@ -89,12 +92,12 @@ app.get("/persons/:id", (req, res) => {
   }
 });
 
-app.get("/persons", (req, res) => {
+app.get('/persons', (req, res) => {
   res.json(persons);
 });
 
 //https://stackoverflow.com/questions/10645994/how-to-format-a-utc-date-as-a-yyyy-mm-dd-hhmmss-string-using-nodejs
-app.get("/info", (req, res) => {
+app.get('/info', (req, res) => {
   res.send(
     `<div>
       <h1>Phonebook Info</h1>
@@ -103,13 +106,13 @@ app.get("/info", (req, res) => {
       } persons</p>
       <p>${new Date()
         .toISOString()
-        .replace(/T/, " ")
-        .replace(/\..+/, "")}
+        .replace(/T/, ' ')
+        .replace(/\..+/, '')}
     </div>`
   );
 });
 
-app.get("/notes/:id", (request, response) => {
+app.get('/notes/:id', (request, response) => {
   const id = Number(request.params.id);
   const note = notes.find(note => {
     console.log(note.id, typeof note.id, id, typeof id, note.id === id);
@@ -122,7 +125,7 @@ app.get("/notes/:id", (request, response) => {
   }
 });
 
-app.delete("/notes/:id", (request, response) => {
+app.delete('/notes/:id', (request, response) => {
   const id = Number(request.params.id);
   notes = notes.filter(note => note.id !== id);
 
