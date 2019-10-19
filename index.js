@@ -2,7 +2,7 @@ const http = require('http');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
+//const morgan = require('morgan');
 const cors = require('cors');
 app.use(cors());
 app.use(bodyParser.json());
@@ -80,6 +80,10 @@ app.post('/persons', (request, response) => {
   persons = persons.concat(person);
 
   response.json(person);
+});
+
+app.get('/', (request, response) => {
+  response.send('<h1>Hello</h1>');
 });
 
 app.delete('/persons/:id', (request, response) => {
