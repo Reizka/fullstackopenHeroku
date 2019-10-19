@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 app.use(cors());
 app.use(bodyParser.json());
-morgan.token('response', function(req, res) {
+/*morgan.token('response', function(req, res) {
   return JSON.stringify(req.body);
 });
 app.use(
@@ -21,7 +21,7 @@ app.use(
       tokens['response'](req, res)
     ].join(' ');
   })
-);
+);*/
 
 let persons = [
   {
