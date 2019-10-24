@@ -67,6 +67,7 @@ app.post('/persons', (request, response) => {
       return person.name === body.name;
     })
   ) {
+    console.log('name must be unique');
     return response.status(400).json({
       error: 'name must be unique'
     });

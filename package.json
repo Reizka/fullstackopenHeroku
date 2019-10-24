@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:ui": "cp -a I:/Dev/Projects/web/FullStackOpen/osa2/phonebook/build I:/Dev/Projects/web/fullStackOpenHeroku/",
+    "deploy": "git push origin master",
     "start": "node index.js",
     "watch": "nodemon index.js",
-    "deploy": "git push heroku master",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
