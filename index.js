@@ -53,7 +53,7 @@ const generateId = function() {
   return no;
 };
 
-app.post('/persons', (request, response) => {
+app.post('api/persons', (request, response) => {
   const body = request.body;
 
   if (!body || !body.name || !body.number) {
@@ -84,11 +84,11 @@ app.post('/persons', (request, response) => {
   response.json(person);
 });
 
-app.get('/', (request, response) => {
+app.get('api/', (request, response) => {
   response.send('<h1>Hello</h1>');
 });
 
-app.delete('/persons/:id', (request, response) => {
+app.delete('api/persons/:id', (request, response) => {
   const id = Number(request.params.id);
 
   persons = persons.filter(function(person) {
@@ -98,7 +98,7 @@ app.delete('/persons/:id', (request, response) => {
   response.status(204).end();
 });
 
-app.get('/persons/:id', (req, res) => {
+app.get('api/persons/:id', (req, res) => {
   const id = Number(req.params.id);
   person = persons.find(function(person) {
     //console.log(person.id, typeof person.id, id, typeof id, person.id === id);
@@ -114,12 +114,12 @@ app.get('/persons/:id', (req, res) => {
   }
 });
 
-app.get('/persons', (req, res) => {
+app.get('api/persons', (req, res) => {
   res.json(persons);
 });
 
 //https://stackoverflow.com/questions/10645994/how-to-format-a-utc-date-as-a-yyyy-mm-dd-hhmmss-string-using-nodejs
-app.get('/info', (req, res) => {
+app.get('api/info', (req, res) => {
   res.send(
     `<div>
       <h1>Phonebook Info</h1>
@@ -134,7 +134,7 @@ app.get('/info', (req, res) => {
   );
 });
 
-app.get('/notes/:id', (request, response) => {
+app.get('api/persons/:id', (request, response) => {
   const id = Number(request.params.id);
   const note = notes.find(note => {
     console.log(note.id, typeof note.id, id, typeof id, note.id === id);
@@ -147,7 +147,7 @@ app.get('/notes/:id', (request, response) => {
   }
 });
 
-app.delete('/notes/:id', (request, response) => {
+app.delete('api/persons/:id', (request, response) => {
   const id = Number(request.params.id);
   notes = notes.filter(note => note.id !== id);
 
