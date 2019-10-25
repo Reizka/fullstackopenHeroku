@@ -1,146 +1,115 @@
-const http = require('http');
+require('dotenv').config();
+
+const uuidv1 = require('uuid/v1');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-//const morgan = require('morgan');
 const cors = require('cors');
+
+const Person = require('./models/person');
+const errors = require('./utility/errorHandlers');
+
+const errorHandler = errors.errorHandler;
+const unknownEndpoint = errors.unknownEndpoint;
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('build'));
 
-let persons = [
-  {
-    name: 'Mister Lacelove',
-    number: '39-44-5323523',
-    id: 1
-  },
-  {
-    name: 'BraaAda Lovelace',
-    number: '39-44-5323523',
-    id: 2
-  },
-  {
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-    id: 3
-  },
-  {
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-    id: 4
-  }
-];
+app.post('/api/persons', (req, res, next) => {
+  const body = req.body;
 
-const generateId = function() {
-  console.log('started');
-  let no = Math.floor(Math.random() * (1000000 + persons.length));
-  return no;
-};
+  const person = new Person({
+    name: body.name,
+    number: body.number
+    //id: uuidv1()
+  });
 
-app.post('/api/persons', (request, response) => {
-  const body = request.body;
-
-  if (!body || !body.name || !body.number) {
-    return response.status(400).json({
-      error: 'content missing'
-    });
-  }
-
-  if (
-    persons.find(function(person) {
-      return person.name === body.name;
+  person
+    .save()
+    .then(savedPerson => {
+      return savedPerson.toJSON();
     })
-  ) {
-    console.log('name must be unique');
-    return response.status(400).json({
-      error: 'name must be unique'
-    });
-  }
+    .then(function(savedAndFormattedNote) {
+      console.log('savedAndFormattedNote', savedAndFormattedNote);
+      res.json(savedAndFormattedNote);
+    })
+    .catch(error => next(error));
+});
+
+app.delete('/api/persons/:id', (req, res, next) => {
+  console.log('person to be deleted', req.params.id, typeof req.params.id);
+  Person.findByIdAndRemove(req.params.id)
+    .then(function() {
+      res.status(204).end();
+    })
+    .catch(error => next(error));
+});
+
+app.get('/api/persons/:id', (req, res, next) => {
+  //const id = Number(req.params.id);
+  console.log('get by id', req.params.id, typeof req.params.id);
+  Person.findById(req.params.id)
+    .then(function(person) {
+      if (person) {
+        console.log('response', person);
+        res.json(person.toJSON());
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => next(error));
+});
+
+app.put('/api/persons/:id', (req, res, next) => {
+  console.log('put person', req.body);
+  const body = req.body;
 
   const person = {
     name: body.name,
-    number: body.number,
-    id: generateId()
+    number: body.number
   };
-  console.log('person', person);
-  persons = persons.concat(person);
 
-  response.json(person);
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson.toJSON());
+    })
+    .catch(error => next(error));
 });
 
-app.get('/', (request, response) => {
-  console.log('base');
-  response.send('<h1>Hello</h1>');
-});
-
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id);
-
-  persons = persons.filter(function(person) {
-    return person.id !== id;
-  });
-
-  response.status(204).end();
-});
-
-app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  person = persons.find(function(person) {
-    //console.log(person.id, typeof person.id, id, typeof id, person.id === id);
-    if (person.id === id) {
-      return person;
-    }
-  });
-
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  }
-});
-
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
   console.log('get persons');
-  res.json(persons);
+  Person.find({})
+    .then(function(people) {
+      res.json(people.map(person => person.toJSON()));
+    })
+    .catch(error => next(error));
 });
 
 //https://stackoverflow.com/questions/10645994/how-to-format-a-utc-date-as-a-yyyy-mm-dd-hhmmss-string-using-nodejs
 app.get('/api/info', (req, res) => {
   console.log('get info');
-  res.send(
-    `<div>
-      <h1>Phonebook Info</h1>
-      <p> Currently the phonebook db has stored info of ${
-        persons.length
-      } persons</p>
-      <p>${new Date()
-        .toISOString()
-        .replace(/T/, ' ')
-        .replace(/\..+/, '')}
-    </div>`
-  );
+  const p = null;
+  Person.find({})
+    .then(function(people) {
+      res.send(
+        `<div>
+          <h1>Phonebook Info</h1>
+          <p> Currently the phonebook db has stored info of ${
+            people.length
+          } people</p>
+          <p>${new Date()
+            .toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')}
+        </div>`
+      );
+    })
+    .catch(error => next(error));
 });
 
-app.get('/api/persons/:id', (request, response) => {
-  console.log('get person');
-  const id = Number(request.params.id);
-  const note = notes.find(note => {
-    console.log(note.id, typeof note.id, id, typeof id, note.id === id);
-    return note.id === id;
-  });
-  if (note) {
-    response.json(note);
-  } else {
-    response.status(404).end();
-  }
-});
-
-app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id);
-  notes = notes.filter(note => note.id !== id);
-
-  response.status(204).end();
-});
+app.use(unknownEndpoint);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
