@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 mongoose.set('useUnifiedTopology', true);
+const uniqueValidator = require('mongoose-unique-validator');
 const url = process.env.MONGODB_URI;
 
 console.log('connecting to', url);
@@ -14,23 +15,24 @@ mongoose
     console.log('error connecting to MongoDB:', error.message);
   });
 
-const noteSchema = new mongoose.Schema({
+const personSchema = new mongoose.Schema({
   name: {
     type: String,
-
+    unique: true,
+    minlength: 3,
     required: true
   },
   number: {
     type: String,
-    minlength: 5,
+    minlength: 8,
     required: true
   }
   //id: String
 });
 
-const Person = mongoose.model('Person', noteSchema);
+personSchema.plugin(uniqueValidator);
 
-noteSchema.set('toJSON', {
+personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -38,4 +40,4 @@ noteSchema.set('toJSON', {
   }
 });
 
-module.exports = mongoose.model('Person', noteSchema);
+module.exports = mongoose.model('Person', personSchema);
