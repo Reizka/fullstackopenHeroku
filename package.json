@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint .",
     "build:ui": "cp -a I:/Dev/Projects/web/FullStackOpen/osa2/phonebook/build I:/Dev/Projects/web/fullStackOpenHeroku/",
     "deploy": "git push origin master",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
@@ -31,6 +32,7 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "eslint": "^6.5.1",
     "morgan": "^1.9.1",
     "nodemon": "^1.19.3"
   }

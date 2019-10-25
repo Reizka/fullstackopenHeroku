@@ -1,14 +1,11 @@
 require('dotenv').config();
 
-const uuidv1 = require('uuid/v1');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
 const Person = require('./models/person');
 const errors = require('./utility/errorHandlers');
-
 const errorHandler = errors.errorHandler;
 const unknownEndpoint = errors.unknownEndpoint;
 
@@ -22,7 +19,6 @@ app.post('/api/persons', (req, res, next) => {
   const person = new Person({
     name: body.name,
     number: body.number
-    //id: uuidv1()
   });
 
   person
@@ -87,21 +83,21 @@ app.get('/api/persons', (req, res, next) => {
 });
 
 //https://stackoverflow.com/questions/10645994/how-to-format-a-utc-date-as-a-yyyy-mm-dd-hhmmss-string-using-nodejs
-app.get('/api/info', (req, res) => {
+app.get('/api/info', (req, res,next) => {
   console.log('get info');
-  const p = null;
+
   Person.find({})
     .then(function(people) {
       res.send(
         `<div>
           <h1>Phonebook Info</h1>
           <p> Currently the phonebook db has stored info of ${
-            people.length
-          } people</p>
+  people.length
+} people</p>
           <p>${new Date()
-            .toISOString()
-            .replace(/T/, ' ')
-            .replace(/\..+/, '')}
+    .toISOString()
+    .replace(/T/, ' ')
+    .replace(/\..+/, '')}
         </div>`
       );
     })
