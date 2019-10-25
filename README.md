@@ -1,1 +1,1 @@
-https://fullstackopenheroku.herokuapp.com/
+https://fshapp.herokuapp.com/
